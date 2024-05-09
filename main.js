@@ -17,7 +17,9 @@ async function main() {
 
   const link = argv[2];
   console.log("Crawling your website: ", link);
+  console.time("Crawling Performance");
   const pages = await crawlPage(link);
+  console.timeEnd("Crawling Performance");
   printReport(pages);
 }
 

@@ -78,11 +78,22 @@ async function crawlPage(baseURL, currentURL = baseURL, pages = {}) {
   const htmlBody = await parseHtml(currentURL);
   const parsedURLs = getURLsFromHTML(htmlBody, baseURL);
 
-  for (const nextURL of parsedURLs) {
-    pages = await crawlPage(baseURL, nextURL, pages);
-  }
+  // using concurrency to speed things up
+  const promises = parsedURLs.map((pageURL) =>
+    crawlPage(baseURL, pageURL, pages)
+  );
+  const results = await Promise.all(promises);
 
-  return pages;
+  const mergedPages = results.reduce(
+    (acc, result) => ({ ...acc, ...result }),
+    {}
+  );
+  return mergedPages;
+
+  // for (const nextURL of parsedURLs) {
+  //   pages = await crawlPage(baseURL, nextURL, pages);
+  // }
+  // return pages;
 }
 
 export { normailzeURL, getURLsFromHTML, crawlPage };
